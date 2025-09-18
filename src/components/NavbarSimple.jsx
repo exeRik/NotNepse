@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Group, Text } from "@mantine/core"; // ✅ added Text
+import { Group, Text, ActionIcon, Drawer } from "@mantine/core";
+import { useMediaQuery } from '@mantine/hooks'; // ✅ import hook
 import {
   IconBellRinging,
   IconReceipt2,
@@ -9,6 +11,7 @@ import {
   IconSwitchHorizontal,
   IconLogout,
   IconBrandReact,
+  IconMenu2,
 } from "@tabler/icons-react";
 import classes from "./NavbarSimple.module.css";
 
@@ -21,50 +24,118 @@ const data = [
 ];
 
 export default function NavbarSimple() {
+  const [opened, setOpened] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)'); // screen <768px considered mobile
+
   return (
-    <nav className={classes.navbar}>
-      <div className={classes.navbarMain}>
-        {/* Header / Logo */}
-        <Group
-          className={classes.header}
-          position="apart"
-          align="center"
-          spacing="sm"
-          style={{ marginBottom: "1.5rem" }} // extra spacing below header
+    <>
+      {/* Mobile Menu Icon */}
+      {isMobile && (
+        <ActionIcon
+          size="lg"
+          variant="filled"
+          onClick={() => setOpened(true)}
+          style={{ position: "fixed", top: 20, left: 20, zIndex: 1000 }}
         >
-          <IconBrandReact size={36} stroke={1.5} />
-          <Text weight={700} size="lg" color="black">
-            Definitely not nepse-
-          </Text>
-        </Group>
+          <IconMenu2 size={24} />
+        </ActionIcon>
+      )}
 
-        {/* Navigation Links */}
-        {data.map((item) => (
-          <NavLink
-            key={item.label}
-            to={item.link}
-            className={({ isActive }) =>
-              `${classes.link} ${isActive ? classes.active : ""}`
-            }
+      {/* Drawer for mobile */}
+      <Drawer
+        opened={opened}
+        onClose={() => setOpened(false)}
+        padding="md"
+        size="250px"
+        overlayOpacity={0.55}
+        overlayBlur={3}
+      >
+        <div className={classes.navbarMain}>
+          <Group
+            className={classes.header}
+            position="apart"
+            align="center"
+            spacing="sm"
+            style={{ marginBottom: "1.5rem" }}
           >
-            <item.icon className={classes.linkIcon} stroke={1.5} />
-            <span>{item.label}</span>
-          </NavLink>
-        ))}
-      </div>
+            <IconBrandReact size={36} stroke={1.5} />
+            <Text weight={700} size="lg" color="black">
+              Definitely not nepse-
+            </Text>
+          </Group>
 
-      {/* Footer */}
-      <div className={classes.footer}>
-        <NavLink to="/change-account" className={classes.link}>
-          <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-          <span>Change account</span>
-        </NavLink>
+          {data.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.link}
+              className={({ isActive }) =>
+                `${classes.link} ${isActive ? classes.active : ""}`
+              }
+              onClick={() => setOpened(false)}
+            >
+              <item.icon className={classes.linkIcon} stroke={1.5} />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
 
-        <NavLink to="/logout" className={classes.link}>
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
-        </NavLink>
-      </div>
-    </nav>
+          <div className={classes.footer} style={{ marginTop: "auto" }}>
+            <NavLink to="/change-account" className={classes.link}>
+              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
+              <span>Change account</span>
+            </NavLink>
+
+            <NavLink to="/logout" className={classes.link}>
+              <IconLogout className={classes.linkIcon} stroke={1.5} />
+              <span>Logout</span>
+            </NavLink>
+          </div>
+        </div>
+      </Drawer>
+
+      {/* Desktop Navbar */}
+      {!isMobile && (
+        <nav className={classes.navbar}>
+          <div className={classes.navbarMain}>
+            <Group
+              className={classes.header}
+              position="apart"
+              align="center"
+              spacing="sm"
+              style={{ marginBottom: "1.5rem" }}
+            >
+              <IconBrandReact size={36} stroke={1.5} />
+              <Text weight={700} size="lg" color="black">
+                Definitely not nepse-
+              </Text>
+            </Group>
+
+            {data.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.link}
+                className={({ isActive }) =>
+                  `${classes.link} ${isActive ? classes.active : ""}`
+                }
+              >
+                <item.icon className={classes.linkIcon} stroke={1.5} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+
+          <div className={classes.footer}>
+            <NavLink to="/change-account" className={classes.link}>
+              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
+              <span>Change account</span>
+            </NavLink>
+
+            <NavLink to="/logout" className={classes.link}>
+              <IconLogout className={classes.linkIcon} stroke={1.5} />
+              <span>Logout</span>
+            </NavLink>
+          </div>
+        </nav>
+      )}
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Container, Grid } from '@mantine/core';
+import { Container, Grid, Paper } from '@mantine/core';
 
 import HeaderSection from '../components/HeaderSection';
 import MetricsCard from '../components/MetricsCard';
@@ -7,16 +7,13 @@ import ChartSection from '../components/ChartSection';
 import MarketSummary from '../components/MarketSummary';
 import RecentTransactions from '../components/RecentTransactions';
 
-// Import JSON demo data
 import stockJson from '../data/stockData.json';
 
 const Dashboard = () => {
-  // Extract actual array from JSON
   const [stockData] = useState(stockJson.data);
   const [selectedTimeframe, setSelectedTimeframe] = useState('7D');
   const [selectedChart, setSelectedChart] = useState('price');
 
-  // Prepare chart data
   const chartData = useMemo(() => stockData
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .map(item => ({
@@ -29,7 +26,6 @@ const Dashboard = () => {
 
   const latestData = stockData[0];
 
-  // Calculate metrics
   const metrics = useMemo(() => {
     const avgVolume = stockData.reduce((sum, item) => sum + parseInt(item.turnover_volume || 0), 0) / stockData.length;
     const avgTurnover = stockData.reduce((sum, item) => sum + (item.turnover_values || 0), 0) / stockData.length;
@@ -45,25 +41,51 @@ const Dashboard = () => {
 
   return (
     <Container fluid style={{ minHeight: '100vh', padding: 20 }}>
-      {/* Header */}
-      <HeaderSection selectedTimeframe={selectedTimeframe} setSelectedTimeframe={setSelectedTimeframe} />
+      {/* Header Section */}
+      <HeaderSection
+        selectedTimeframe={selectedTimeframe}
+        setSelectedTimeframe={setSelectedTimeframe}
+        style={{ marginBottom: 30 }}
+      />
 
-      {/* Metrics Cards */}
-      <Grid gutter="md" mt="md">
-        <Grid.Col span={3}><MetricsCard type="price" data={latestData} metrics={metrics} /></Grid.Col>
-        <Grid.Col span={3}><MetricsCard type="volume" data={latestData} metrics={metrics} /></Grid.Col>
-        <Grid.Col span={3}><MetricsCard type="range" data={latestData} metrics={metrics} /></Grid.Col>
-        <Grid.Col span={3}><MetricsCard type="turnover" data={latestData} metrics={metrics} /></Grid.Col>
-      </Grid>
+{/* Metrics Cards */}
+<Grid gutter="md" mt="md">
+  {['price', 'volume', 'range', 'turnover'].map((type, index) => (
+    <Grid.Col span={6} sm={6} md={3} key={index}>
+      <Paper shadow="sm" radius="md" p="md" style={{ minHeight: 120 }}>
+        <MetricsCard type={type} data={latestData} metrics={metrics} />
+      </Paper>
+    </Grid.Col>
+  ))}
+</Grid>
+
 
       {/* Charts & Market Summary */}
-      <Grid gutter="md" mt="md">
-        <Grid.Col span={8}><ChartSection chartData={chartData} selectedChart={selectedChart} setSelectedChart={setSelectedChart} /></Grid.Col>
-        <Grid.Col span={4}><MarketSummary latestData={latestData} metrics={metrics} /></Grid.Col>
+      <Grid gutter="md" mt={20}>
+        <Grid.Col xs={12} md={8}>
+          <Paper shadow="sm" radius="md" p="md" style={{ minHeight: 400 }}>
+            <ChartSection
+              chartData={chartData}
+              selectedChart={selectedChart}
+              setSelectedChart={setSelectedChart}
+            />
+          </Paper>
+        </Grid.Col>
+        <Grid.Col xs={12} md={4}>
+          <Paper shadow="sm" radius="md" p="md" style={{ minHeight: 400 }}>
+            <MarketSummary latestData={latestData} metrics={metrics} />
+          </Paper>
+        </Grid.Col>
       </Grid>
 
       {/* Recent Transactions */}
-      <RecentTransactions stockData={stockData} />
+      <Grid mt={20}>
+        <Grid.Col xs={12}>
+          <Paper shadow="sm" radius="md" p="md">
+            <RecentTransactions stockData={stockData} />
+          </Paper>
+        </Grid.Col>
+      </Grid>
     </Container>
   );
 };
