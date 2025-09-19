@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Container, Grid, Paper } from '@mantine/core';
+import {Helmet} from "react-helmet";
+ 
 
 import HeaderSection from '../components/HeaderSection';
 import MetricsCard from '../components/MetricsCard';
@@ -40,7 +42,9 @@ const Dashboard = () => {
   }, [stockData, latestData]);
 
   return (
+    <>
     <Container fluid style={{ minHeight: '100vh', padding: 20 }}>
+      
       {/* Header Section */}
       <HeaderSection
         selectedTimeframe={selectedTimeframe}
@@ -87,6 +91,8 @@ const Dashboard = () => {
         </Grid.Col>
       </Grid>
     </Container>
+    </>
+    
   );
 };
 
