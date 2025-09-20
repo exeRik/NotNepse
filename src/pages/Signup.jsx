@@ -11,16 +11,27 @@ import {
   Title,
 } from '@mantine/core';
 import classes from '../components/Signup.module.css';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+
 
 export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implement signup logic (e.g., check if passwords match, API call)
+
     console.log("Signup form submitted");
   };
+  const url= import.meta.env.VITE_BASE_URL;
+  console.log("url",url)
 
   return (
+
     <Container size={420} my={40}>
       <Title ta="center" className={classes.title}>
         Create an account
@@ -43,12 +54,22 @@ export default function Signup() {
         onSubmit={handleSubmit}
       >
         <TextInput
+          label="Name"
+          placeholder="you@gmail.com"
+          type="name"
+          autoComplete="name"
+          required
+          radius="md"
+          onChange={(e) => setName(e.target.value)}
+        />
+        <TextInput
           label="Email"
           placeholder="you@gmail.com"
           type="email"
           autoComplete="email"
           required
           radius="md"
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <PasswordInput
@@ -58,8 +79,9 @@ export default function Signup() {
           required
           mt="md"
           radius="md"
+          onChange={(e) => setPassword(e.target.value)}
         />
-
+{/* 
         <PasswordInput
           label="Confirm Password"
           placeholder="Confirm your password"
@@ -67,15 +89,41 @@ export default function Signup() {
           required
           mt="md"
           radius="md"
-        />
+        /> */}
 
         <Group justify="space-between" mt="lg">
           <Checkbox label="Remember me" />
         </Group>
 
-        <Button type="submit" fullWidth mt="xl" radius="md">
-          Sign up
-        </Button>
+ <Button
+      onClick={() => {
+        fetch(`${url}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({name, email, password}) 
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Signup NOT SUCCESSFUL!!");
+            }
+            return response.json();
+          })
+          .then(data => {
+            alert("Signup success:", data);
+            navigate("/login"); 
+          })
+          .catch(error => {
+            alert("Something went wrong: " + error.message);
+            console.error("Signup error:", error);
+          });
+      }}
+      type="submit"
+      fullWidth
+      mt="xl"
+      radius="md"
+    >
+      Signup
+    </Button>
       </Paper>
     </Container>
   );

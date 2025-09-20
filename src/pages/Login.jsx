@@ -11,12 +11,19 @@ import {
   Title,
 } from '@mantine/core';
 import classes from '../components/Signup.module.css'; // Make sure styles match usage
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 export default function Login() {
+
+  const navigate = useNavigate();
+
+  const url= import.meta.env.VITE_BASE_URL;
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implement login logic (e.g., API call)
     console.log("Login submitted");
   };
 
@@ -49,6 +56,7 @@ export default function Login() {
           autoComplete="email"
           required
           radius="md"
+          onChange={(e) => setEmail(e.target.value)}
         />
         <PasswordInput
           label="Password"
@@ -57,6 +65,7 @@ export default function Login() {
           required
           mt="md"
           radius="md"
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <Group justify="space-between" mt="lg">
@@ -66,9 +75,36 @@ export default function Login() {
           </Anchor>
         </Group>
 
-        <Button type="submit" fullWidth mt="xl" radius="md">
-          Sign in
-        </Button>
+ <Button
+      onClick={() => {
+        fetch(`${url}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({email, password}) 
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Signup NOT SUCCESSFUL!!");
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log(data.token)
+            localStorage.setItem("token", data.token);
+            navigate("/dashboard"); 
+          })
+          .catch(error => {
+            alert("Something went wrong: " + error.message);
+            console.error("Login error:", error);
+          });
+      }}
+      type="submit"
+      fullWidth
+      mt="xl"
+      radius="md"
+    >
+      Login
+    </Button>
       </Paper>
     </Container>
   );

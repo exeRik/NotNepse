@@ -1,8 +1,24 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
 import NavbarSimple from "./components/NavbarSimple";
-import DashboardPage from "./pages/Dashboard";
-import MarketDataPage from "./pages/MarketData";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import Dashboard from "./pages/Dashboard";
+import MarketData from "./pages/MarketData";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 // import PortfolioPage from "./pages/PortfolioPage";
@@ -25,8 +41,16 @@ function AppContent() {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/market" element={<MarketDataPage />} />
+          <Route path="/dashboard" element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }></Route>
+          <Route path="/market" element={
+    <ProtectedRoute>
+      <MarketData />
+    </ProtectedRoute>
+  }></Route>
           {/* <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} /> */}
