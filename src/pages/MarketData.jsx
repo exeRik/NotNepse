@@ -55,15 +55,15 @@ const MarketDataDashboard = () => {
     <div style={{ minHeight: "100vh", padding: "2rem", background: "#f8f9fa" }}>
       {/* Header & Controls stay fixed */}
       <div style={{ marginBottom: "1rem" }}>
-        <Title order={2} mb="sm">Complete Market Data Table</Title>
+        <Title order={2} mb="sm">LIVE Market Data</Title>
         <Group position="apart">
           <Group spacing={5}>
             <Filter size={16} color="gray" />
             <Text size="sm" c="dimmed">Total Records: {rawData.length}</Text>
           </Group>
-          <Text size="sm" c="dimmed">
+          {/* <Text size="sm" c="dimmed">
             Sorted by: <strong>{sortBy} ({sortOrder.toUpperCase()})</strong>
-          </Text>
+          </Text> */}
         </Group>
       </div>
 

@@ -47,10 +47,10 @@ export default function NavbarSimple() {
       <IconUser size={36} stroke={1.5} />
       <div>
         <Text weight={700} size="lg" color="black">
-          {user.name || "Guest"}
+          {user.name || "Guest Guest"}
         </Text>
         <Text size="sm" color="dimmed">
-          {user.username || "@guest"}
+          {user.username || "guest@gmail.com"}
         </Text>
       </div>
     </Group>

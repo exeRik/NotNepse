@@ -22,13 +22,13 @@ function AppContent() {
 
   // Dynamic page titles
   const pageTitles = {
-    "/": "Login | Stock App",
-    "/login": "Login | Stock App",
-    "/signup": "Signup | Stock App",
-    "/dashboard": "Dashboard | Stock App",
-    "/market": "Market Data | Stock App",
-    "/portfolio": "Portfolio | Stock App",
-    "/settings": "Settings | Stock App",
+    "/": "Login ",
+    "/login": "Login ",
+    "/signup": "Signup ",
+    "/dashboard": "Dashboard ",
+    "/market": "Market Data ",
+    "/portfolio": "Portfolio ",
+    "/settings": "Settings ",
   };
 
   return (
