@@ -5,16 +5,16 @@ const RecentTransactions = ({ stockData }) => {
     <Paper p="md" withBorder radius="md" bg="light.6">
       <Text weight={700} mb="md">Recent Trading Data</Text>
       <Table striped highlightOnHover verticalSpacing="sm">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Close</th>
-            <th>Change</th>
-            <th>Volume</th>
-            <th>Turnover</th>
-          </tr>
-        </thead>
-        <tbody>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Date</Table.Th>
+            <Table.Th>Close</Table.Th>
+            <Table.Th>Change</Table.Th>
+            <Table.Th>Volume</Table.Th>
+            <Table.Th>Turnover</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
           {stockData.slice(0, 6).map((item) => (
             <tr key={item.id}>
               <td>{new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
@@ -26,7 +26,7 @@ const RecentTransactions = ({ stockData }) => {
               <td>Rs.{(item.turnover_values/1000000000).toFixed(2)}B</td>
             </tr>
           ))}
-        </tbody>
+         </Table.Tbody>
       </Table>
     </Paper>
   );

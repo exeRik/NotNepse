@@ -1,36 +1,83 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Group, Text, ActionIcon, Drawer } from "@mantine/core";
-import { useMediaQuery } from '@mantine/hooks'; // ✅ import hook
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconBellRinging,
   IconReceipt2,
   IconFingerprint,
-  IconKey,
   IconSettings,
   IconSwitchHorizontal,
   IconLogout,
-  IconBrandReact,
+  IconUser,
   IconMenu2,
 } from "@tabler/icons-react";
 import classes from "./NavbarSimple.module.css";
 
 const data = [
-  { link: "/", label: "Dashboard", icon: IconBellRinging },
+  { link: "/dashboard", label: "Dashboard", icon: IconBellRinging },
   { link: "/market", label: "Market Data", icon: IconReceipt2 },
   { link: "/portfolio", label: "Portfolio", icon: IconFingerprint },
-  { link: "/reports", label: "Reports", icon: IconKey },
   { link: "/settings", label: "Settings", icon: IconSettings },
 ];
 
 export default function NavbarSimple() {
-  const [opened, setOpened] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 768px)'); // screen <768px considered mobile
+  const [opened, setOpened] = useState(false); 
+  const isMobile = useMediaQuery("(max-width: 768px)"); 
+
+  const userName = "Smaran Pokharel";
+  const userUsername = "@smaran123";
+
+  const navigate = useNavigate();
+
+  // User info at top
+  const renderUserHeader = () => (
+    <Group
+      className={classes.header}
+      position="apart"
+      align="center"
+      spacing="sm"
+      style={{ marginBottom: "1.5rem" }}
+    >
+      <IconUser size={36} stroke={1.5} />
+      <div>
+        <Text weight={700} size="lg" color="black">
+          {userName}
+        </Text>
+        <Text size="sm" color="dimmed">
+          {userUsername}
+        </Text>
+      </div>
+    </Group>
+  );
+
+  // Handlers
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // remove token
+    navigate("/login"); // redirect to login
+  };
+
+
+
+  // Footer for both desktop and mobile
+  const renderFooter = () => (
+    <div className={classes.footer} style={{ marginTop: "auto" }}>
+      <div className={classes.link} onClick={handleLogout} style={{ cursor: "pointer" }}>
+        <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
+        <span>Change account</span>
+      </div>
+
+      <div className={classes.link} onClick={handleLogout} style={{ cursor: "pointer" }}>
+        <IconLogout className={classes.linkIcon} stroke={1.5} />
+        <span>Logout</span>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      {/* Mobile Menu Icon */}
-      {isMobile && (
+      {/* Only show hamburger icon on mobile */}
+      {isMobile && !opened && (
         <ActionIcon
           size="lg"
           variant="filled"
@@ -51,18 +98,7 @@ export default function NavbarSimple() {
         overlayBlur={3}
       >
         <div className={classes.navbarMain}>
-          <Group
-            className={classes.header}
-            position="apart"
-            align="center"
-            spacing="sm"
-            style={{ marginBottom: "1.5rem" }}
-          >
-            <IconBrandReact size={36} stroke={1.5} />
-            <Text weight={700} size="lg" color="black">
-              Definitely not nepse-
-            </Text>
-          </Group>
+          {renderUserHeader()}
 
           {data.map((item) => (
             <NavLink
@@ -78,17 +114,7 @@ export default function NavbarSimple() {
             </NavLink>
           ))}
 
-          <div className={classes.footer} style={{ marginTop: "auto" }}>
-            <NavLink to="/change-account" className={classes.link}>
-              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-              <span>Change account</span>
-            </NavLink>
-
-            <NavLink to="/logout" className={classes.link}>
-              <IconLogout className={classes.linkIcon} stroke={1.5} />
-              <span>Logout</span>
-            </NavLink>
-          </div>
+          {renderFooter()}
         </div>
       </Drawer>
 
@@ -96,18 +122,7 @@ export default function NavbarSimple() {
       {!isMobile && (
         <nav className={classes.navbar}>
           <div className={classes.navbarMain}>
-            <Group
-              className={classes.header}
-              position="apart"
-              align="center"
-              spacing="sm"
-              style={{ marginBottom: "1.5rem" }}
-            >
-              <IconBrandReact size={36} stroke={1.5} />
-              <Text weight={700} size="lg" color="black">
-                Definitely not nepse-
-              </Text>
-            </Group>
+            {renderUserHeader()}
 
             {data.map((item) => (
               <NavLink
@@ -123,17 +138,7 @@ export default function NavbarSimple() {
             ))}
           </div>
 
-          <div className={classes.footer}>
-            <NavLink to="/change-account" className={classes.link}>
-              <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-              <span>Change account</span>
-            </NavLink>
-
-            <NavLink to="/logout" className={classes.link}>
-              <IconLogout className={classes.linkIcon} stroke={1.5} />
-              <span>Logout</span>
-            </NavLink>
-          </div>
+          {renderFooter()}
         </nav>
       )}
     </>
