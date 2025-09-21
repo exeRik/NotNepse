@@ -2,7 +2,7 @@ import { Group, Text, Title, Button } from '@mantine/core';
 import { Paper } from '@mantine/core';
 
 const HeaderSection = ({ selectedTimeframe, setSelectedTimeframe }) => {
-  const timeframes = ['1D', '7D', '1M', '3M', '1Y'];
+  const timeframes = ['1D', '2D', '5D', '7D', '10D'];
 
   return (
     <Paper p="md" withBorder radius="md" bg="light.7">

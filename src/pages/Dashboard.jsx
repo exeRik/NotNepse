@@ -11,53 +11,64 @@ import RecentTransactions from '../components/RecentTransactions';
 
 import stockJson from '../data/stockData.json';
 
+const timeframes = ['1D', '2D', '5D', '7D', '10D']; // example timeframes
+
 const Dashboard = () => {
-  const navigate = useNavigate(); // For redirect
-  const [stockData] = useState(stockJson.data);
-  const [selectedTimeframe, setSelectedTimeframe] = useState('7D');
+  const navigate = useNavigate();
+  const [selectedTimeframe, setSelectedTimeframe] = useState('5D');
   const [selectedChart, setSelectedChart] = useState('price');
 
-  const chartData = useMemo(
-    () => stockData
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
-      .map(item => ({
-        ...item,
-        date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        volume: parseInt(item.turnover_volume || 0),
-        turnover: (item.turnover_values || 0) / 1000000000
-      })),
+  const allStockData = stockJson.data;
+
+  // Filter stock data based on timeframe
+  const stockData = useMemo(() => {
+    let days = parseInt(selectedTimeframe);
+    return allStockData
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // latest first
+      .slice(0, days)
+      .reverse(); // oldest first for chart
+  }, [allStockData, selectedTimeframe]);
+
+  // Prepare chart data
+  const chartData = useMemo(() => 
+    stockData.map(item => ({
+      ...item,
+      date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      volume: parseInt(item.turnover_volume || 0),
+      turnover: (item.turnover_values || 0) / 1000000000
+    })),
     [stockData]
   );
 
-  const latestData = stockData[0];
+  const latestData = stockData[stockData.length - 1]; // newest
 
+  // Calculate metrics dynamically
   const metrics = useMemo(() => {
+    if (!stockData.length) return {};
     const avgVolume = stockData.reduce((sum, item) => sum + parseInt(item.turnover_volume || 0), 0) / stockData.length;
     const avgTurnover = stockData.reduce((sum, item) => sum + (item.turnover_values || 0), 0) / stockData.length;
     const volatility = Math.sqrt(stockData.reduce((sum, item) => sum + Math.pow(item.percentage_change || 0, 2), 0) / stockData.length);
-
     return {
       avgVolume,
       avgTurnover: avgTurnover / 1000000000,
       volatility,
-      priceRange: (latestData.fifty_two_weeks_high || 0) - (latestData.fifty_two_weeks_low || 0)
+      priceRange: (Math.max(...stockData.map(d => d.fifty_two_weeks_high)) - Math.min(...stockData.map(d => d.fifty_two_weeks_low)))
     };
-  }, [stockData, latestData]);
+  }, [stockData]);
 
   return (
     <>
-      
       <Helmet>
         <title>Dashboard </title>
         <meta name="description" content="View market overview, charts, and recent transactions on your stock dashboard." />
       </Helmet>
 
       <Container fluid style={{ minHeight: '100vh', padding: 20 }}>
-        
         {/* Header Section */}
         <HeaderSection
           selectedTimeframe={selectedTimeframe}
           setSelectedTimeframe={setSelectedTimeframe}
+          timeframes={timeframes}
           style={{ marginBottom: 30 }}
         />
 
@@ -72,6 +83,14 @@ const Dashboard = () => {
           </Grid.Col>
         </Grid>
 
+
+        <Grid mt={20}>
+          <Grid.Col xs={12} md={4}>
+            <MarketSummary latestData={latestData} metrics={metrics} timeframe={selectedTimeframe}  />
+          </Grid.Col>
+        </Grid>
+
+        
         {/* Metrics Cards */}
         <Grid gutter="md" mt="md">
           {['price', 'volume', 'range', 'turnover'].map((type, index) => (
@@ -82,13 +101,7 @@ const Dashboard = () => {
             </Grid.Col>
           ))}
         </Grid>
-
-        <Grid mt={20}>
-          <Grid.Col xs={12} md={4}>
-            <MarketSummary latestData={latestData} metrics={metrics} />
-          </Grid.Col>
-        </Grid>
-
+        
         {/* Recent Transactions */}
         <Grid mt={20}>
           <Grid.Col xs={12}>

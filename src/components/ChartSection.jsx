@@ -1,15 +1,26 @@
-import { Paper, Group, Button, Text } from '@mantine/core';
+import { Paper, Group, Button, Text, Box } from '@mantine/core';
 import { AreaChart, Area, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { DollarSign, Volume2 } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { IconMoneybag } from '@tabler/icons-react';
 
 const ChartSection = ({ chartData, selectedChart, setSelectedChart }) => {
   return (
     <Paper p="md" withBorder radius="md" bg="light.6">
-      <Group position="apart" align="flex-start" wrap="wrap">
-        <Text weight={700}>Price Movement</Text>
-        <Group>
-          {[{ key: 'price', label: 'Price', icon: IconMoneybag }, { key: 'volume', label: 'Volume', icon: Volume2 }].map(({ key, label, icon: Icon }) => (
+      
+      {/* Header + Buttons */}
+      <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
+        {/* Centered Header */}
+        <Text 
+          weight={900} 
+          size="2xl" 
+          style={{ flex: 1, textAlign: 'left', color: "#1c1c1c", letterSpacing: 0.5 }}
+        >
+          Price Movement
+        </Text>
+
+        {/* Buttons aligned right */}
+        <Group spacing="xs">
+          {[{ key: 'price', label: 'Price', icon: DollarSign }, { key: 'volume', label: 'Volume', icon:  IconMoneybag}].map(({ key, label, icon: Icon }) => (
             <Button
               key={key}
               variant={selectedChart === key ? 'filled' : 'outline'}
@@ -22,8 +33,9 @@ const ChartSection = ({ chartData, selectedChart, setSelectedChart }) => {
             </Button>
           ))}
         </Group>
-      </Group>
+      </Box>
 
+      {/* Chart */}
       <div style={{ width: '100%', height: 320 }}>
         <ResponsiveContainer width="100%" height="100%">
           {selectedChart === 'price' ? (

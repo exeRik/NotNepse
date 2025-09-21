@@ -3,7 +3,8 @@ import { Paper, Table, Text } from '@mantine/core';
 const RecentTransactions = ({ stockData }) => {
   return (
     <Paper p="md" withBorder radius="md" bg="light.6">
-      <Text weight={700} mb="md">Recent Trading Data</Text>
+      <Text weight={700} mb="md" 
+        style={{ letterSpacing: 0.5, color: "#1c1c1c" }}>Recent Trading Data</Text>
       <Table striped highlightOnHover verticalSpacing="sm">
         <Table.Thead>
           <Table.Tr>

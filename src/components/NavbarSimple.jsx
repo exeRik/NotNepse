@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Group, Text, ActionIcon, Drawer } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
@@ -13,6 +13,7 @@ import {
   IconMenu2,
 } from "@tabler/icons-react";
 import classes from "./NavbarSimple.module.css";
+import { getUserFromToken } from "../utils/getUserFromToken";
 
 const data = [
   { link: "/dashboard", label: "Dashboard", icon: IconBellRinging },
@@ -22,13 +23,17 @@ const data = [
 ];
 
 export default function NavbarSimple() {
-  const [opened, setOpened] = useState(false); 
-  const isMobile = useMediaQuery("(max-width: 768px)"); 
+  const [opened, setOpened] = useState(false);
+  const [user, setUser] = useState({ name: "", username: "" });
 
-  const userName = "Smaran Pokharel";
-  const userUsername = "@smaran123";
-
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const navigate = useNavigate();
+
+  // Fetch user from token on mount
+  useEffect(() => {
+    const userFromToken = getUserFromToken();
+    if (userFromToken) setUser(userFromToken);
+  }, []);
 
   // User info at top
   const renderUserHeader = () => (
@@ -42,32 +47,38 @@ export default function NavbarSimple() {
       <IconUser size={36} stroke={1.5} />
       <div>
         <Text weight={700} size="lg" color="black">
-          {userName}
+          {user.name || "Guest"}
         </Text>
         <Text size="sm" color="dimmed">
-          {userUsername}
+          {user.username || "@guest"}
         </Text>
       </div>
     </Group>
   );
 
-  // Handlers
+  // Logout / Change account
   const handleLogout = () => {
-    localStorage.removeItem("token"); // remove token
-    navigate("/login"); // redirect to login
+    localStorage.removeItem("token");
+    navigate("/login");
   };
-
-
 
   // Footer for both desktop and mobile
   const renderFooter = () => (
     <div className={classes.footer} style={{ marginTop: "auto" }}>
-      <div className={classes.link} onClick={handleLogout} style={{ cursor: "pointer" }}>
+      <div
+        className={classes.link}
+        onClick={handleLogout}
+        style={{ cursor: "pointer" }}
+      >
         <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
         <span>Change account</span>
       </div>
 
-      <div className={classes.link} onClick={handleLogout} style={{ cursor: "pointer" }}>
+      <div
+        className={classes.link}
+        onClick={handleLogout}
+        style={{ cursor: "pointer" }}
+      >
         <IconLogout className={classes.linkIcon} stroke={1.5} />
         <span>Logout</span>
       </div>
