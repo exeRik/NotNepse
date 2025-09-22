@@ -6,7 +6,7 @@ A **React-based application** for stock tracking, portfolio management, and acco
 
 
 ## **LIVEurl**
-
+https://not-nepse.vercel.app
 ---
 
 ## **Features**
