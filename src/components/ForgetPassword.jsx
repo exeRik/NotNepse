@@ -9,7 +9,6 @@ const ForgetPassword = ({ onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would call your backend API to send reset link
     console.log("Sending reset link to:", email);
     setSuccess(true);
     setEmail("");
