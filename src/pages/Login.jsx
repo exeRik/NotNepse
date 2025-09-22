@@ -10,7 +10,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import classes from '../components/Signup.module.css'; // Make sure styles match usage
+import classes from '../components/Signup.module.css'; 
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 

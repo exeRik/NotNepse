@@ -13,7 +13,6 @@ import {
   IconMenu2,
 } from "@tabler/icons-react";
 import classes from "./NavbarSimple.module.css";
-import { getUserFromToken } from "../utils/getUserFromToken";
 
 const data = [
   { link: "/dashboard", label: "Dashboard", icon: IconBellRinging },
@@ -25,17 +24,49 @@ const data = [
 export default function NavbarSimple() {
   const [opened, setOpened] = useState(false);
   const [user, setUser] = useState({ name: "", username: "" });
-
   const isMobile = useMediaQuery("(max-width: 768px)");
   const navigate = useNavigate();
 
-  // Fetch user from token on mount
+  // Fetch user profile on mount
   useEffect(() => {
-    const userFromToken = getUserFromToken();
-    if (userFromToken) setUser(userFromToken);
-  }, []);
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  // User info at top
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch("http://192.168.1.114:3000/users/profile", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // send token
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+
+        const data = await response.json();
+
+       
+        const profile = data.user || data;
+
+        setUser({
+          name: profile.name || "Unknown User",
+          username: profile.email || "no-email@example.com",
+        });
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        // If unauthorized, clear token & redirect
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
+  // User info 
   const renderUserHeader = () => (
     <Group
       className={classes.header}
@@ -46,10 +77,10 @@ export default function NavbarSimple() {
     >
       <IconUser size={36} stroke={1.5} />
       <div>
-        <Text weight={700} size="lg" color="black">
+        <Text fw={700} size="lg" c="black">
           {user.name || "Guest Guest"}
         </Text>
-        <Text size="sm" color="dimmed">
+        <Text size="sm" c="dimmed">
           {user.username || "guest@gmail.com"}
         </Text>
       </div>
@@ -62,7 +93,7 @@ export default function NavbarSimple() {
     navigate("/login");
   };
 
-  // Footer for both desktop and mobile
+  // Footer
   const renderFooter = () => (
     <div className={classes.footer} style={{ marginTop: "auto" }}>
       <div
@@ -87,7 +118,7 @@ export default function NavbarSimple() {
 
   return (
     <>
-      {/* Only show hamburger icon on mobile */}
+      {/* Mobile hamburger */}
       {isMobile && !opened && (
         <ActionIcon
           size="lg"

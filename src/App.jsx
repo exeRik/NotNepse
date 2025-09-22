@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -11,6 +11,15 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PortfolioPage from "./pages/Portfolio";
 import SettingsPage from "./pages/Settings";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+// function ProtectedRoute({ children }) {
+//   const token = localStorage.getItem("token"); 
+//   if (!token) {
+//     return <Navigate to="/login" replace />;
+//   }
+//   return children;
+// }
 
 function AppContent() {
   const location = useLocation();
@@ -22,13 +31,13 @@ function AppContent() {
 
   // Dynamic page titles
   const pageTitles = {
-    "/": "Login ",
-    "/login": "Login ",
-    "/signup": "Signup ",
-    "/dashboard": "Dashboard ",
-    "/market": "Market Data ",
-    "/portfolio": "Portfolio ",
-    "/settings": "Settings ",
+    "/": "Login",
+    "/login": "Login",
+    "/signup": "Signup",
+    "/dashboard": "Dashboard",
+    "/market": "Market Data",
+    "/portfolio": "Portfolio",
+    "/settings": "Settings",
   };
 
   return (
@@ -67,10 +76,40 @@ function AppContent() {
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/market" element={<MarketData />} />
-            <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/market"
+              element={
+                <ProtectedRoute>
+                  <MarketData />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/portfolio"
+              element={
+                <ProtectedRoute>
+                  <PortfolioPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+
             <Route path="*" element={<h1>Page Not Found</h1>} />
           </Routes>
         </main>
@@ -83,9 +122,7 @@ function App() {
   return (
     <HelmetProvider>
       <MantineProvider
-        theme={{
-          colorScheme: "dark",
-        }}
+        theme={{ colorScheme: "dark" }}
         withGlobalStyles
         withNormalizeCSS
       >

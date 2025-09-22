@@ -11,7 +11,7 @@ import RecentTransactions from '../components/RecentTransactions';
 
 import stockJson from '../data/stockData.json';
 
-const timeframes = ['1D', '2D', '5D', '7D', '10D']; // example timeframes
+const timeframes = ['1D', '2D', '5D', '7D', '10D'];
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -20,16 +20,16 @@ const Dashboard = () => {
 
   const allStockData = stockJson.data;
 
-  // Filter stock data based on timeframe
+
   const stockData = useMemo(() => {
     let days = parseInt(selectedTimeframe);
     return allStockData
-      .sort((a, b) => new Date(b.date) - new Date(a.date)) // latest first
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) 
       .slice(0, days)
-      .reverse(); // oldest first for chart
+      .reverse(); 
   }, [allStockData, selectedTimeframe]);
 
-  // Prepare chart data
+
   const chartData = useMemo(() => 
     stockData.map(item => ({
       ...item,
@@ -40,9 +40,9 @@ const Dashboard = () => {
     [stockData]
   );
 
-  const latestData = stockData[stockData.length - 1]; // newest
+  const latestData = stockData[stockData.length - 1];
 
-  // Calculate metrics dynamically
+
   const metrics = useMemo(() => {
     if (!stockData.length) return {};
     const avgVolume = stockData.reduce((sum, item) => sum + parseInt(item.turnover_volume || 0), 0) / stockData.length;
@@ -64,7 +64,7 @@ const Dashboard = () => {
       </Helmet>
 
       <Container fluid style={{ minHeight: '100vh', padding: 20 }}>
-        {/* Header Section */}
+       
         <HeaderSection
           selectedTimeframe={selectedTimeframe}
           setSelectedTimeframe={setSelectedTimeframe}
@@ -72,7 +72,7 @@ const Dashboard = () => {
           style={{ marginBottom: 30 }}
         />
 
-        {/* Charts & Market Summary */}
+       
         <Grid gutter="md" mt={20}>
           <Grid.Col xs={12} md={8}>
             <ChartSection
@@ -91,7 +91,7 @@ const Dashboard = () => {
         </Grid>
 
         
-        {/* Metrics Cards */}
+      
         <Grid gutter="md" mt="md">
           {['price', 'volume', 'range', 'turnover'].map((type, index) => (
             <Grid.Col span={6} sm={6} md={3} key={index}>
@@ -102,15 +102,14 @@ const Dashboard = () => {
           ))}
         </Grid>
         
-        {/* Recent Transactions */}
+       
         <Grid mt={20}>
           <Grid.Col xs={12}>
             <RecentTransactions stockData={stockData} />
 
-            {/* Divider for separation */}
             <Divider my="md" label=" " />
 
-            {/* Show Full Chart Button */}
+         
             <Button
               fullWidth
               size="md"

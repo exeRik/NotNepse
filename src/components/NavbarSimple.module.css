@@ -1,20 +1,20 @@
 .navbar {
-  position: fixed; /* ✅ stays fixed */
+  position: fixed; 
   top: 0;
   left: 0;
-  width: 320px; /* same as before */
-  height: 100vh; /* full viewport height */
+  width: 320px;
+  height: 100vh; 
   padding: var(--mantine-spacing-md);
   display: flex;
   flex-direction: column;
   border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
-  background-color: var(--mantine-color-body); /* ✅ background so content doesn’t overlap */
-  z-index: 100; /* stay above content */
+  background-color: var(--mantine-color-body); 
+  z-index: 100; 
 }
 
 .navbarMain {
   flex: 1;
-  overflow-y: auto; /* ✅ scroll inside navbar if links overflow */
+  overflow-y: auto; 
 }
 
 

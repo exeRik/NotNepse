@@ -14,8 +14,12 @@ import {
   Center,
   Notification,
 } from "@mantine/core";
-import { IconEdit, IconDeviceFloppy, IconX, IconAlertCircle } from "@tabler/icons-react";
-import { getUserFromToken } from "../utils/getUserFromToken";
+import {
+  IconEdit,
+  IconDeviceFloppy,
+  IconX,
+  IconAlertCircle,
+} from "@tabler/icons-react";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -23,25 +27,49 @@ const UserProfile = () => {
   const [editedUser, setEditedUser] = useState(null);
   const [error, setError] = useState("");
 
-  // Fetch user info from token on mount
+
   useEffect(() => {
-    try {
-      const userFromToken = getUserFromToken();
-      if (userFromToken) {
-        setUser(userFromToken);
-        setEditedUser(userFromToken);
-      } else {
-        // No token or invalid token
-        setUser({ name: "Guest", email: "" });
-        setEditedUser({ name: "Guest", email: "" });
-        setError("Cannot access user info. Token missing or invalid.");
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        //  Guest fallback if no token
+        if (!token) {
+          setError("No token found. Showing guest profile.");
+          setUser({ name: "Guest", email: "guest@example.com" });
+          setEditedUser({ name: "Guest", email: "guest@example.com" });
+          return;
+        }
+
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/users/profile`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, 
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+
+        const data = await response.json();
+        const profile = data.user || data;
+
+        setUser(profile);
+        setEditedUser(profile);
+      } catch (err) {
+        console.error(err);
+        setError("Error fetching user profile. Showing guest profile.");
+        setUser({ name: "Guest", email: "guest@example.com" });
+        setEditedUser({ name: "Guest", email: "guest@example.com" });
       }
-    } catch (err) {
-      setUser({ name: "Guest", email: "" });
-      setEditedUser({ name: "Guest", email: "" });
-      setError("Error fetching user info.");
-      console.error(err);
-    }
+    };
+
+    fetchUserProfile();
   }, []);
 
   const handleChange = (field, value) => {
@@ -53,14 +81,24 @@ const UserProfile = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/update-profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(editedUser),
-      });
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setError("Guests cannot update profile. Please log in.");
+        return;
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/users/update-profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(editedUser),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to update profile");
 
@@ -119,20 +157,33 @@ const UserProfile = () => {
             </div>
           </Group>
 
-          {!isEditing ? (
-            <Button leftSection={<IconEdit size={16} />} onClick={() => setIsEditing(true)}>
+          {/* Disable editing for guests */}
+          {user.name !== "Guest" && !isEditing ? (
+            <Button
+              leftSection={<IconEdit size={16} />}
+              onClick={() => setIsEditing(true)}
+            >
               Edit Profile
             </Button>
-          ) : (
+          ) : isEditing ? (
             <Group>
-              <Button leftSection={<IconDeviceFloppy size={16} />} color="green" onClick={handleSave}>
+              <Button
+                leftSection={<IconDeviceFloppy size={16} />}
+                color="green"
+                onClick={handleSave}
+              >
                 Save
               </Button>
-              <Button leftSection={<IconX size={16} />} color="gray" variant="light" onClick={handleCancel}>
+              <Button
+                leftSection={<IconX size={16} />}
+                color="gray"
+                variant="light"
+                onClick={handleCancel}
+              >
                 Cancel
               </Button>
             </Group>
-          )}
+          ) : null}
         </Group>
 
         {/* Profile Details */}
