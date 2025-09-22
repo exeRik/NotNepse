@@ -53,7 +53,7 @@ const MarketDataDashboard = () => {
 
   return (
     <div style={{ minHeight: "100vh", padding: "2rem", background: "#f8f9fa" }}>
-      {/* Header & Controls stay fixed */}
+
       <div style={{ marginBottom: "1rem" }}>
         <Title order={2} mb="sm">LIVE Market Data</Title>
         <Group position="apart">

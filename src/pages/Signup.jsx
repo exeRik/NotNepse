@@ -64,7 +64,7 @@ export default function Signup() {
         />
         <TextInput
           label="Email"
-          placeholder="you@gmail.com"
+          placeholder="guest@gmail.com"
           type="email"
           autoComplete="email"
           required

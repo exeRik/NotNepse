@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import {
   Lock,
   Bell,
-
   Eye,
-
   Globe,
   Moon,
   Sun,

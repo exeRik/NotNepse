@@ -34,7 +34,7 @@ export default function NavbarSimple() {
 
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch("http://192.168.1.114:3000/users/profile", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/users/profile`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function NavbarSimple() {
 
         const data = await response.json();
 
-       
+       console.log(data)
         const profile = data.user || data;
 
         setUser({

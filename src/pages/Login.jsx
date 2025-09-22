@@ -84,12 +84,12 @@ export default function Login() {
         })
           .then(response => {
             if (!response.ok) {
-              throw new Error("Signup NOT SUCCESSFUL!!");
+              throw new Error("Login NOT SUCCESSFUL!!");
             }
             return response.json();
           })
           .then(data => {
-            console.log(data.token)
+            // console.log(data.token)
             localStorage.setItem("token", data.token);
             navigate("/dashboard"); 
           })
