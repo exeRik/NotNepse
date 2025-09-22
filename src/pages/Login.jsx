@@ -9,22 +9,44 @@ import {
   Text,
   TextInput,
   Title,
+  Modal,
+  Stack,
 } from '@mantine/core';
-import classes from '../components/Signup.module.css'; 
+import classes from '../components/Signup.module.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import ForgetPassword from '../components/ForgetPassword'; // adjust path
 
 export default function Login() {
-
   const navigate = useNavigate();
+  const url = import.meta.env.VITE_BASE_URL;
 
-  const url= import.meta.env.VITE_BASE_URL;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [forgetModalOpen, setForgetModalOpen] = useState(false);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login submitted");
+    // Login API call
+    fetch(`${url}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Login NOT SUCCESSFUL!!");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        localStorage.setItem("token", data.token);
+        navigate("/dashboard");
+      })
+      .catch((error) => {
+        alert("Something went wrong: " + error.message);
+        console.error("Login error:", error);
+      });
   };
 
   return (
@@ -70,42 +92,28 @@ export default function Login() {
 
         <Group justify="space-between" mt="lg">
           <Checkbox label="Remember me" />
-          <Anchor component="button" size="sm">
+          <Anchor
+            component="button"
+            size="sm"
+            onClick={() => setForgetModalOpen(true)}
+          >
             Forgot password?
           </Anchor>
         </Group>
 
- <Button
-      onClick={() => {
-        fetch(`${url}/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({email, password}) 
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error("Login NOT SUCCESSFUL!!");
-            }
-            return response.json();
-          })
-          .then(data => {
-            // console.log(data.token)
-            localStorage.setItem("token", data.token);
-            navigate("/dashboard"); 
-          })
-          .catch(error => {
-            alert("Something went wrong: " + error.message);
-            console.error("Login error:", error);
-          });
-      }}
-      type="submit"
-      fullWidth
-      mt="xl"
-      radius="md"
-    >
-      Login
-    </Button>
+        <Button type="submit" fullWidth mt="xl" radius="md">
+          Login
+        </Button>
       </Paper>
+
+      {/* Forget Password Modal */}
+      <Modal
+        opened={forgetModalOpen}
+        onClose={() => setForgetModalOpen(false)}
+        title="Reset Password"
+      >
+        <ForgetPassword onClose={() => setForgetModalOpen(false)} />
+      </Modal>
     </Container>
   );
 }

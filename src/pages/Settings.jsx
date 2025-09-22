@@ -21,12 +21,15 @@ import {
   Divider,
   Alert,
   Stack,
+  Modal,
 } from "@mantine/core";
+import ForgetPassword from "../components/ForgetPassword"; // adjust path
 
 const Settings = () => {
   const [showPasswordSuccess, setShowPasswordSuccess] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState("en");
+  const [forgetModalOpen, setForgetModalOpen] = useState(false);
 
   // Password form state
   const [passwordForm, setPasswordForm] = useState({
@@ -124,6 +127,15 @@ const Settings = () => {
               <Button type="submit" color="blue">
                 Update Password
               </Button>
+
+              {/* Forget Password Button */}
+              <Button
+                variant="outline"
+                color="red"
+                onClick={() => setForgetModalOpen(true)}
+              >
+                Forgot Password?
+              </Button>
             </Stack>
           </form>
 
@@ -218,6 +230,15 @@ const Settings = () => {
           </Stack>
         </Paper>
       </Stack>
+
+      {/* Forget Password Modal */}
+      <Modal
+        opened={forgetModalOpen}
+        onClose={() => setForgetModalOpen(false)}
+        title="Reset Password"
+      >
+        <ForgetPassword onClose={() => setForgetModalOpen(false)} />
+      </Modal>
     </Container>
   );
 };

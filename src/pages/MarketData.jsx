@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Table,
   Paper,
@@ -6,36 +6,52 @@ import {
   Group,
   Badge,
   Title,
+  Loader,
+  Center,
+  Notification,
 } from "@mantine/core";
 import { TrendingUp, TrendingDown, ArrowUp, ArrowDown, Filter } from "lucide-react";
 import { useMediaQuery } from "@mantine/hooks";
-import stockJson from "../data/stockData.json";
+import { useNavigate } from "react-router-dom";
 
 const MarketDataDashboard = () => {
+  const navigate = useNavigate();
+  const [rawData, setRawData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
-  const rawData = stockJson.data;
+
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const formatNumber = (num) => {
-    if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
-    if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
-    if (num >= 1e3) return (num / 1e3).toFixed(1) + "K";
-    return num?.toLocaleString() || "0";
-  };
 
-  const formatCurrency = (num) =>
-    `Rs.${num?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}`;
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
-  const sortedData = useMemo(() => {
-    const sorted = [...rawData].sort((a, b) => {
-      let aVal = sortBy === "date" ? new Date(a.date) : a[sortBy];
-      let bVal = sortBy === "date" ? new Date(b.date) : b[sortBy];
-      return sortOrder === "asc" ? (aVal < bVal ? -1 : aVal > bVal ? 1 : 0) : aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
-    });
-    return sorted;
-  }, [rawData, sortBy, sortOrder]);
+    fetch(`${import.meta.env.VITE_BASE_URL}/dashboard`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Failed to fetch stock data");
+        const json = await res.json();
+        setRawData(json.data || []); // extract the array
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Could not load stock data");
+        setLoading(false);
+      });
+  }, [navigate]);
 
+  // Sorting
   const handleSort = (column) => {
     if (sortBy === column) setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     else {
@@ -46,14 +62,49 @@ const MarketDataDashboard = () => {
 
   const SortButton = ({ column, children }) => (
     <Group gap={5} onClick={() => handleSort(column)} style={{ cursor: "pointer" }}>
-      <Text size="sm" fw={500}>{children}</Text>
+      <Text size="sm" fw={500}>
+        {children}
+      </Text>
       {sortBy === column && (sortOrder === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />)}
     </Group>
   );
 
+  const sortedData = useMemo(() => {
+    const sorted = [...rawData].sort((a, b) => {
+      let aVal = sortBy === "date" ? new Date(a.date) : a[sortBy];
+      let bVal = sortBy === "date" ? new Date(b.date) : b[sortBy];
+      return sortOrder === "asc"
+        ? aVal < bVal
+          ? -1
+          : aVal > bVal
+          ? 1
+          : 0
+        : aVal > bVal
+        ? -1
+        : aVal < bVal
+        ? 1
+        : 0;
+    });
+    return sorted;
+  }, [rawData, sortBy, sortOrder]);
+
+  // Formatting helpers
+  const formatNumber = (num) => {
+    if (!num) return "0";
+    if (num >= 1e9) return (num / 1e9).toFixed(2) + "B";
+    if (num >= 1e6) return (num / 1e6).toFixed(2) + "M";
+    if (num >= 1e3) return (num / 1e3).toFixed(1) + "K";
+    return num.toLocaleString();
+  };
+
+  const formatCurrency = (num) =>
+    `Rs.${num?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}`;
+
+  if (loading) return <Center style={{ height: "100vh" }}><Loader size="xl" /></Center>;
+  if (error) return <Notification color="red" title="Error">{error}</Notification>;
+
   return (
     <div style={{ minHeight: "100vh", padding: "2rem", background: "#f8f9fa" }}>
-
       <div style={{ marginBottom: "1rem" }}>
         <Title order={2} mb="sm">LIVE Market Data</Title>
         <Group position="apart">
@@ -61,13 +112,9 @@ const MarketDataDashboard = () => {
             <Filter size={16} color="gray" />
             <Text size="sm" c="dimmed">Total Records: {rawData.length}</Text>
           </Group>
-          {/* <Text size="sm" c="dimmed">
-            Sorted by: <strong>{sortBy} ({sortOrder.toUpperCase()})</strong>
-          </Text> */}
         </Group>
       </div>
 
-      {/* Paper contains scrollable table only */}
       <Paper shadow="sm" radius="md" p="md" withBorder bg="white">
         <div style={{ overflowX: isMobile ? "auto" : "visible" }}>
           <Table
@@ -103,13 +150,13 @@ const MarketDataDashboard = () => {
                     <Group gap={5}>
                       {item.absolute_change >= 0 ? <TrendingUp size={14} color="limegreen" /> : <TrendingDown size={14} color="red" />}
                       <Text fw={500} c={item.absolute_change >= 0 ? "green" : "red"}>
-                        {item.absolute_change >= 0 ? "+" : ""}{item.absolute_change.toFixed(2)}
+                        {item.absolute_change >= 0 ? "+" : ""}{(item.absolute_change ?? 0).toFixed(2)}
                       </Text>
                     </Group>
                   </td>
                   <td>
                     <Text fw={500} c={item.percentage_change >= 0 ? "green" : "red"}>
-                      {item.percentage_change >= 0 ? "+" : ""}{item.percentage_change.toFixed(2)}%
+                      {item.percentage_change >= 0 ? "+" : ""}{(item.percentage_change ?? 0).toFixed(2)}%
                     </Text>
                   </td>
                   <td>{formatNumber(item.turnover_volume)}</td>

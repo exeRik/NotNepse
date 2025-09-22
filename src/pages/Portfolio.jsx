@@ -27,7 +27,7 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({});
   const [error, setError] = useState("");
-  const [profileFile, setProfileFile] = useState(null); // new state for file
+  const [profileFile, setProfileFile] = useState(null); 
 
   useEffect(() => {
     const fetchUserProfile = async () => {
